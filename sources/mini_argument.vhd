@@ -13,23 +13,46 @@ entity mini_argument is
         h : in vector_8;
         u : in matrix_8_8;
         b : in vector_8;
-        s : out real);
+        s : out real := 0.0);
 end mini_argument;
 
 architecture Behavioral of mini_argument is
-
+    signal output_vector : vector_8 := (others=>0.0);
 begin
-    process (read_en)
+    process ( clk )
         variable sum : real := 0.0;
+        variable xw : vector_8 := (others=>0.0);
+        variable hu : vector_8 := (others=>0.0);
     begin
---        for i in 0 to M-1 loop
---            for j in 0 to N-1 loop
---                sum := 0;
---                for k in 0 to P-1 loop
---                    sum := sum + to_integer(signed(matrix_a(i, k)) * signed(matrix_b(k, j)));
---                end loop;
---                matrix_c(i, j) <= std_logic_vector(to_signed(sum, 32));
---            end loop;
---        end loop;
+        if (rising_edge(clk)) then
+            if (read_en = '0') then
+
+             for i in 0 to 7 loop
+                    sum := 0.0;
+                for j in 0 to 3 loop
+                    sum := sum + (x(j) * w(j, i)) ;
+                end loop;
+                    xw(i) := sum;
+             end loop; -- x*w matrix
+           
+             for i in 0 to 7 loop
+                    sum := 0.0;
+                for j in 0 to 7 loop
+                    sum := sum + (h(j) * u(j, i)) ;
+                end loop;
+                    hu(i) := sum;
+             end loop; -- h*u matrix
+            
+            for i in 0 to 7 loop
+                    output_vector(i) <=  xw(i) + hu(i) + b(i);
+            end loop; -- output vector
+            
+            s <= 0.0;
+            elsif (read_en = '1') 
+            then
+                s <= output_vector(0);
+                output_vector <= output_vector(1 to 7) & 0.0;
+            end if;
+        end if;      
     end process;
 end Behavioral;
