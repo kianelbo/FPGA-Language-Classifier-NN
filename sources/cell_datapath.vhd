@@ -13,7 +13,7 @@ entity cell_datapath is
         ht_1 : in vector_8;
         ct_1 : in real;
         ct : out real;
-        ht: out real);
+        ht : out real);
 end cell_datapath;
 
 architecture RTL of cell_datapath is

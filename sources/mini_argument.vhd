@@ -19,37 +19,35 @@ end mini_argument;
 architecture Behavioral of mini_argument is
     signal output_vector : vector_8 := (others=>0.0);
 begin
-    process ( clk )
+    process (clk)
         variable sum : real := 0.0;
         variable xw : vector_8 := (others=>0.0);
         variable hu : vector_8 := (others=>0.0);
     begin
         if (rising_edge(clk)) then
             if (read_en = '0') then
-
-             for i in 0 to 7 loop
+				for i in 0 to 7 loop
                     sum := 0.0;
-                for j in 0 to 3 loop
-                    sum := sum + (x(j) * w(j, i)) ;
-                end loop;
+	                for j in 0 to 3 loop
+	                    sum := sum + (x(j) * w(j, i)) ;
+	                end loop;
                     xw(i) := sum;
-             end loop; -- x*w matrix
+             	end loop; -- x*w matrix
            
-             for i in 0 to 7 loop
+             	for i in 0 to 7 loop
                     sum := 0.0;
-                for j in 0 to 7 loop
-                    sum := sum + (h(j) * u(j, i)) ;
-                end loop;
+	                for j in 0 to 7 loop
+	                    sum := sum + (h(j) * u(j, i)) ;
+	                end loop;
                     hu(i) := sum;
-             end loop; -- h*u matrix
+             	end loop; -- h*u matrix
             
-            for i in 0 to 7 loop
+            	for i in 0 to 7 loop
                     output_vector(i) <=  xw(i) + hu(i) + b(i);
-            end loop; -- output vector
+            	end loop; -- output vector
             
-            s <= 0.0;
-            elsif (read_en = '1') 
-            then
+            	s <= 0.0;
+            elsif (read_en = '1') then
                 s <= output_vector(0);
                 output_vector <= output_vector(1 to 7) & 0.0;
             end if;
