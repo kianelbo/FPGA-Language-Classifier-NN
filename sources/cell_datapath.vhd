@@ -17,15 +17,18 @@ entity cell_datapath is
 end cell_datapath;
 
 architecture RTL of cell_datapath is
-    component mini_argument is Port (
-        clk : in std_logic;
-        read_en : in std_logic;
-        x : in vector_4;
-        w : in matrix_4_8;
-        h : in vector_8;
-        u : in matrix_8_8;
-        b : in vector_8;
-        s : out real);
+    component mini_argument is
+        Generic
+            (delay : integer := 0);
+        Port (
+            clk : in std_logic;
+            read_en : in std_logic;
+            x : in vector_4;
+            w : in matrix_4_8;
+            h : in vector_8;
+            u : in matrix_8_8;
+            b : in vector_8;
+            s : out real);
     end component;
     
     component sigmoid_module is Port (
@@ -58,13 +61,13 @@ architecture RTL of cell_datapath is
     signal f_res, i_res, c_res, o_res : real;
     signal temp_ct, temp_f_c, temp_i_c, temp_tanh_c : real;
 begin
-    mini_f : mini_argument port map (
+    mini_f : mini_argument generic map (delay => 0) port map (
             clk => clk, read_en => init_mode, x => xt, w => w_f, h => ht_1, u => u_f, b => b_f, s => arg_f);
-    mini_i : mini_argument port map (
+    mini_i : mini_argument generic map (delay => 0) port map (
             clk => clk, read_en => init_mode, x => xt, w => w_i, h => ht_1, u => u_i, b => b_i, s => arg_i);
-    mini_c : mini_argument port map (
+    mini_c : mini_argument generic map (delay => 2) port map (
             clk => clk, read_en => init_mode, x => xt, w => w_c, h => ht_1, u => u_c, b => b_c, s => arg_c);
-    mini_o : mini_argument port map (
+    mini_o : mini_argument generic map (delay => 4) port map (
             clk => clk, read_en => init_mode, x => xt, w => w_o, h => ht_1, u => u_o, b => b_o, s => arg_o);
 
     f_component : sigmoid_module port map (

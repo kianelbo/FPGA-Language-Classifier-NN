@@ -1,6 +1,5 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.numeric_std.ALL;
 library xil_defaultlib;
 use xil_defaultlib.datatypes_package.all;
 
@@ -27,15 +26,15 @@ architecture Behavioral of LSTM_cell is
         ht: out real);
     end component;
     
-    component counter8 is Port (
+    component counter18 is Port (
         clk : in std_logic;
         rst : in std_logic;
-        cout : out std_logic_vector (2 downto 0));
+        cout : out integer);
     end component;
     
     type state_type is (INIT, CALC);
     signal phase : state_type := INIT;
-    signal cout : std_logic_vector (2 downto 0);
+    signal cout : integer;
     signal counter_rst : std_logic := '1';
     signal datapath_en : std_logic;
     signal done : std_logic := '0';
@@ -53,7 +52,7 @@ begin
             ct => temp_ct,
             ht => temp_ht);
 
-    counter : counter8 port map (
+    counter : counter18 port map (
             clk => clk,
             rst => counter_rst,
             cout => cout);
@@ -70,15 +69,19 @@ begin
                 counter_rst <= '0';
                 phase <= CALC;
             else
-                if cout = "111" then        -- all 8 entries done
+                if cout > 5 and cout < 15 then          -- putting ct-1 and collecting ct
+                    temp_ct_1 <= ct_1(cout);
+                    vector_ct(cout - 6) <= temp_ct;
+                end if;
+                if cout > 9 then                        -- collecting ht
+                    vector_ht(cout - 10) <= temp_ht;
+                elsif cout = 18 then                    -- all 8 entries done
                     done <= '1';
+                    counter_rst <= '1';
                     phase <= INIT;
-                else                        -- still getting entries
-                    temp_ct_1 <= ct_1(to_integer(unsigned(cout)));
-                    vector_ct(to_integer(unsigned(cout))) <= temp_ct;
-                    vector_ht(to_integer(unsigned(cout))) <= temp_ht;
                 end if;
             end if;
         end if;
     end process;
+
 end Behavioral;
