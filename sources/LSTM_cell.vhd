@@ -30,7 +30,7 @@ architecture Behavioral of LSTM_cell is
     component counter18 is Port (
         clk : in std_logic;
         rst : in std_logic;
-        cout : out integer);
+        cnt : out integer range 0 to 18);
     end component;
     
     type state_type is (INIT, CALC);
@@ -56,7 +56,7 @@ begin
     counter : counter18 port map (
             clk => clk,
             rst => counter_rst,
-            cout => index);
+            cnt => index);
     
     ct <= vector_ct;
     ht <= vector_ht;
@@ -65,12 +65,9 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if start = '0' then                             -- like reset state
+            if start = '0' then                                 -- like reset state
                 done <= '0';
                 counter_rst <= '1';
-                temp_ct <= 0.0;
-                temp_ht <= 0.0;
-                temp_ct_1 <= 0.0;
                 vector_ct <= (others => 0.0);
                 vector_ht <= (others => 0.0);
                 phase <= INIT;
@@ -80,16 +77,14 @@ begin
                     counter_rst <= '0';
                     phase <= CALC;
                 else
-                    if index > 5 and index < 15 then          -- putting ct-1 and collecting ct
-                        temp_ct_1 <= ct_1(index);
+                    if index > 5 and index < 14 then            -- putting ct-1 and collecting ct
+                        temp_ct_1 <= ct_1(index - 6);
                         vector_ct(index - 6) <= temp_ct;
                     end if;
-                    if index > 9 then                        -- collecting ht
-                        vector_ht(index - 10) <= temp_ht;
-                    elsif index = 18 then                    -- all 8 entries done
+                    if index = 18 then                          -- collecting ht
                         done <= '1';
-                        counter_rst <= '1';
-                        phase <= INIT;
+                    elsif index > 9 and index < 18 then         -- all 8 entries done
+                        vector_ht(index - 10) <= temp_ht;
                     end if;
                 end if;
             end if;
