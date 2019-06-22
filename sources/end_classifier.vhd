@@ -16,7 +16,7 @@ end end_classifier;
 architecture Behavioral of end_classifier is
     component last_argument is Port (
         clk : in std_logic;
-        read_en : in std_logic;
+        enable : in std_logic;
         in_vector : in vector_8;
         output : out real);        
     end component;
@@ -28,7 +28,7 @@ architecture Behavioral of end_classifier is
         output : out real);
     end component;
     
-    type state_type is (RESET, W1, W2, W3, W4, W5, O1, O2);
+    type state_type is (RESET, W1, W2, W3, W4, W5, W6, W7, O1, O2);
     signal state : state_type := RESET;
     signal sigmoid_in, sigmoid_out : real;
     signal done, enable : std_logic := '0';
@@ -36,10 +36,9 @@ architecture Behavioral of end_classifier is
     
 begin
 
-    the_args : last_argument port map (clk => clk, read_en => enable, in_vector => ht, output => sigmoid_in);
+    the_args : last_argument port map (clk => clk, enable => enable, in_vector => ht, output => sigmoid_in);
     
-    sigmoid : sigmoid_module port map (
-        clk => clk, enable => enable, input => sigmoid_in, output => sigmoid_out);
+    sigmoid : sigmoid_module port map (clk => clk, enable => enable, input => sigmoid_in, output => sigmoid_out);
     
     ready <= done;
     results <= tmp_result;
@@ -50,7 +49,6 @@ begin
             if start = '0' then
                 done <= '0';
                 enable <= '0';
-                sigmoid_out <= 0.0;
                 tmp_result <= (others => 0.0);
                 state <= RESET;
             else
@@ -67,6 +65,10 @@ begin
                     when W4 =>
                         state <= W5;
                     when W5 =>
+                        state <= W6;
+                    when W6 =>
+                        state <= W7;
+                    when W7 =>
                         state <= O1;
                     when O1 =>
                         tmp_result(0) <= sigmoid_out;
