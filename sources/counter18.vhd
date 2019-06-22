@@ -6,11 +6,11 @@ entity counter18 is
     Port (
         clk : in std_logic;
         rst : in std_logic;
-        cout : out integer);
+        cout : out integer range 0 to 18);
 end counter18;
 
 architecture behavorial of counter18 is
-    signal i : integer := 0;
+    signal i : integer range 0 to 18 := 0;
 begin
     process (clk)
     begin
