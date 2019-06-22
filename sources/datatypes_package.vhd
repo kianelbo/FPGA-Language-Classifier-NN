@@ -9,6 +9,8 @@ package datatypes_package is
     type matrix_4_8 is array(0 to 3, 0 to 7) of real;
     type matrix_8_2 is array(0 to 7, 0 to 1) of real;
     type matrix_8_8 is array(0 to 7, 0 to 7) of real;
+    type array_20_4 is array(0 to 19) of vector_4;
+    type array_20_8 is array(0 to 19) of vector_8;
 end datatypes_package;
 
 package body datatypes_package is

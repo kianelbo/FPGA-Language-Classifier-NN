@@ -7,6 +7,7 @@ use xil_defaultlib.datatypes_package.all;
 entity LSTM_cell is
     Port (
         clk : in std_logic;
+        start : in std_logic;
         xt : in vector_4;
         ht_1 : in vector_8;
         ct_1 : in vector_8;
@@ -34,7 +35,7 @@ architecture Behavioral of LSTM_cell is
     
     type state_type is (INIT, CALC);
     signal phase : state_type := INIT;
-    signal cout : integer;
+    signal index : integer;
     signal counter_rst : std_logic := '1';
     signal datapath_en : std_logic;
     signal done : std_logic := '0';
@@ -55,7 +56,7 @@ begin
     counter : counter18 port map (
             clk => clk,
             rst => counter_rst,
-            cout => cout);
+            cout => index);
     
     ct <= vector_ct;
     ht <= vector_ht;
@@ -64,21 +65,32 @@ begin
     process (clk)
     begin
         if rising_edge(clk) then
-            if phase = INIT then
+            if start = '0' then                             -- like reset state
                 done <= '0';
-                counter_rst <= '0';
-                phase <= CALC;
+                counter_rst <= '1';
+                temp_ct <= 0.0;
+                temp_ht <= 0.0;
+                temp_ct_1 <= 0.0;
+                vector_ct <= (others => 0.0);
+                vector_ht <= (others => 0.0);
+                phase <= INIT;
             else
-                if cout > 5 and cout < 15 then          -- putting ct-1 and collecting ct
-                    temp_ct_1 <= ct_1(cout);
-                    vector_ct(cout - 6) <= temp_ct;
-                end if;
-                if cout > 9 then                        -- collecting ht
-                    vector_ht(cout - 10) <= temp_ht;
-                elsif cout = 18 then                    -- all 8 entries done
-                    done <= '1';
-                    counter_rst <= '1';
-                    phase <= INIT;
+                if phase = INIT then
+                    done <= '0';
+                    counter_rst <= '0';
+                    phase <= CALC;
+                else
+                    if index > 5 and index < 15 then          -- putting ct-1 and collecting ct
+                        temp_ct_1 <= ct_1(index);
+                        vector_ct(index - 6) <= temp_ct;
+                    end if;
+                    if index > 9 then                        -- collecting ht
+                        vector_ht(index - 10) <= temp_ht;
+                    elsif index = 18 then                    -- all 8 entries done
+                        done <= '1';
+                        counter_rst <= '1';
+                        phase <= INIT;
+                    end if;
                 end if;
             end if;
         end if;
