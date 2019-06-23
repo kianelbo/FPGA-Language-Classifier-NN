@@ -4,15 +4,16 @@ Only the prediction function is implemented and learning is done priorly.
 Biases and weights can be found [here](https://github.com/kianelbo/FPGA-Language-Classifier-NN/blob/master/docs/Weights%20and%20Biases.txt).  
 
 ## Design Notes
-For being fittable in FPGA, the design is partly sequential and partly parallel. Sequential modules are pipelined for better performance.
+For being fittable in FPGA, the design is partly sequential and partly parallel. Sequential modules are pipelined for better performance.  
+The input is a 20x4 array of values represnting the word's characters. The outputs are probability of being English or Greek.
 
 ## Datapath
-Cell architecture
+#### Cell architecture
 <p align="center">
   <img src="https://github.com/kianelbo/FPGA-Language-Classifier-NN/blob/master/docs/lstm_cell.JPG?raw=true" width="80%" height="80%">
 </p>
 
-Network architecture
+#### Network architecture
 <p align="center">
   <img src="https://github.com/kianelbo/FPGA-Language-Classifier-NN/blob/master/docs/network.JPG?raw=true" width="80%" height="80%">
 </p>
