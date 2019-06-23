@@ -28,7 +28,7 @@ architecture Behavioral of end_classifier is
         output : out real);
     end component;
     
-    type state_type is (RESET, W1, W2, W3, W4, W5, W6, W7, O1, O2);
+    type state_type is (RESET, W1, W2, W3, W4, W5, W6, W7, O1, O2, FINISHED);
     signal state : state_type := RESET;
     signal sigmoid_in, sigmoid_out : real;
     signal done, enable : std_logic := '0';
@@ -75,7 +75,9 @@ begin
                         state <= O2;
                     when O2 =>
                         tmp_result(1) <= sigmoid_out;
-                        done <= '1';
+                        state <= FINISHED;
+                    when FINISHED =>
+                        done <= '1';    
                 end case;
             end if;
         end if;
