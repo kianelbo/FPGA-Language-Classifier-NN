@@ -7,6 +7,7 @@ use xil_defaultlib.datatypes_package.all;
 entity network is
     Port (
         clk : in std_logic;
+        start : in std_logic;
         x_array : in array_20_4;
         results : out vector_2;
         ready : out std_logic);
@@ -34,13 +35,12 @@ architecture RTL of network is
     
     signal zero_vector : vector_8 := (others => 0.0);
     signal ct_array, ht_array : array_20_8;
-    signal one : std_logic := '1';
     signal ready_bits : std_logic_vector (0 to 19);
 begin
 
     cell0 : LSTM_cell port map (
         clk => clk,
-        start => one,
+        start => start,
         xt => x_array(0),
         ht_1 => zero_vector,
         ct_1 => zero_vector,
